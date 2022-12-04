@@ -85,6 +85,7 @@ def admin():
 #Api route to creating a new group
 @app.route('/api/creategroup', methods=['GET', 'POST']) #/api/<groupid>
 def editgroup():
+    groups = channelgroups.get()
     global channelGroupCount
     channelGroupCount+=1
     adduser_form = AddUserForm() #modify to add user to a group - ie add a key/value that connects to group id in question
@@ -108,13 +109,15 @@ def editgroup():
     #        body=sendmessage_form.message_body,      
     #        to=('+1' + channelPhone)) 
     return render_template('editgroup.html', adduser_form=adduser_form, 
-        removeuser_form=removeuser_form, creategroup_form =creategroup_form, 
-        editgroup_form=editgroup_form, sendmessage_form=sendmessage_form)
+        removeuser_form=removeuser_form, creategroup_form =creategroup_form,
+        groups=groups,editgroup_form=editgroup_form, sendmessage_form=sendmessage_form)
 
 
 @app.route('/api/groupgrid', methods=['GET', 'POST'])
 def groupgrid():
     groups = channelgroups.get()
+    for name in groups:
+        group_name=groups.get(str('name'))
     creategroup_form = CreateGroup()
     if creategroup_form.submit:
       channelgroups.child(str(channelGroupCount)).set({
@@ -122,7 +125,7 @@ def groupgrid():
         'Group Description' : creategroup_form.group_desc.data, 
         'Group ID' : str(channelGroupCount)
         })
-    return render_template('groupgrid.html', groups=groups, creategroup_form=creategroup_form)
+    return render_template('groupgrid.html', groups=groups, group_name=group_name, creategroup_form=creategroup_form)
 
 if __name__ == '__main__':
     app.run(debug=True)
